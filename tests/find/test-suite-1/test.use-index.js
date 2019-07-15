@@ -110,6 +110,40 @@ testCases.push(function (dbType, context) {
         err.error.should.equal("no_usable_index");
       });
     });
+
+    it('use index with $in operator', function () {
+      var db = context.db;
+      return db.explain({
+        selector: {
+          name: {
+            $in: ['mario', 'luigi'],
+          },
+          series: 'mario'
+        }
+      }).then(function(res) {
+        resp.index.ddoc.should.equal("_design/index-1");
+      })
+      .catch(function() {
+        throw "Should not get here";
+      });
+    });
+
+    it('find using index with $in operator', function () {
+      var db = context.db;
+      return db.find({
+        selector: {
+          name: {
+            $in: ['mario', 'luigi'],
+          },
+          series: 'mario'
+        }
+      }).then(function(res) {
+        resp.docs.length.should.equal(2);
+      })
+      .catch(function() {
+        throw "Should not get here";
+      });
+    });
   });
 
 });
